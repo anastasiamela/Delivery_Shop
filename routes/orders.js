@@ -1,17 +1,16 @@
+const auth = require('../middleware/auth');
+const admin = require('../middleware/admin');
 const { Order, validate } = require('../models/order');
 const { Product } = require('../models/product');
 const { Cart } = require('../models/cart');
 const mongoose = require('mongoose');
 const Fawn = require('fawn');
 const express = require('express');
-const session = require('express-session');
-// const { Cookie } = require('express-session');
-// const MongoStore = require('connect-mongo')(session);
 const router = express.Router();
 
 Fawn.init(mongoose);
 
-router.get('/', async (req, res) => {
+router.get('/', [auth, admin], async (req, res) => {
     const orders = await Order.find().sort('-date');
     res.send(orders);
 });
@@ -47,9 +46,7 @@ router.post('/', async (req, res) => {
         products: cart.items,
         comments: req.body.comments
     });
-    // await order.save();
-    // req.session.cart = null;
-    // res.send(order);
+
     try {
         console.log('0');
         var task = new Fawn.Task();
@@ -81,7 +78,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', [auth, admin], async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (!order) return res.status(404).send('The order with the given ID was not found.');
