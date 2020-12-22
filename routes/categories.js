@@ -1,7 +1,7 @@
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const validateObjectId = require('../middleware/validateObjectId');
-const {Category, validate, categorySchema} = require('../models/category');
+const {Category, validate} = require('../models/category');
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
@@ -13,15 +13,19 @@ router.get('/', async (req, res) => {
 
 router.post('/', [auth, admin], async (req, res) => {
   const { error } = validate(req.body); 
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) {console.log('1'); return res.status(400).send(error.details[0].message);}
 
-  let category = new Category({ name: req.body.name });
+  let category = await Category.findOne({ name: req.body.name });
+  if (category) return res.status(400).send('Category already exists.');
+
+
+  category = new Category({ name: req.body.name });
   category = await category.save();
   
   res.send(category);
 });
 
-router.put('/:id', [validateObjectId, auth, admin], async (req, res) => {
+router.patch('/:id', [validateObjectId, auth, admin], async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
