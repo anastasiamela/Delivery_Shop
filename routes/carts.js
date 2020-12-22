@@ -22,6 +22,7 @@ router.post('/', async (req, res) => {
   const qty = req.body.quantity;
   const product = await Product.findById(req.body.productId);
   if (!product) return res.status(400).send('Invalid product.');
+  if (product.numberInStock < qty) return res.status(400).send('Product not in stock.');
 
   let cart = new Cart(req.session.cart ? req.session.cart : {});
 
@@ -45,6 +46,7 @@ router.put('/:id', validateObjectId, async (req, res) => {
   const qty = req.body.quantity;
   const product = await Product.findById(req.params.id);
   if (!product) return res.status(400).send('Invalid product.');
+  if (product.numberInStock < qty) return res.status(400).send('Product not in stock.');
 
   const cart = new Cart(req.session.cart ? req.session.cart : {});
 
