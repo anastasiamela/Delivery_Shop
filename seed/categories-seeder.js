@@ -1,6 +1,5 @@
 const { Category } = require('../models/category');
 const mongoose = require('mongoose');
-const { exist } = require('joi');
 
 mongoose.connect('mongodb://localhost/delivery_test', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB...'))
