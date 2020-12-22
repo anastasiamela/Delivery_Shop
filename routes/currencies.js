@@ -8,7 +8,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const currencies = await Currency.find().sort('name');
+  const currencies = await Currency.find().sort('code');
   res.send(currencies);
 });
 
@@ -16,10 +16,10 @@ router.post('/', /*[auth, admin],*/ async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
-  let currency = await Currency.findOne({ name: req.body.name });
+  let currency = await Currency.findOne({ name: req.body.code });
   if (currency) return res.status(400).send('Currency already exists.');
 
-  currency = new Currency({ name: req.body.name });
+  currency = new Currency({ name: req.body.code });
   currency = await currency.save();
   
   res.send(currency);
@@ -29,7 +29,7 @@ router.put('/:id', [auth, admin], async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
-  const currency = await Currency.findByIdAndUpdate(req.params.id, { name: req.body.name }, {
+  const currency = await Currency.findByIdAndUpdate(req.params.id, { code: req.body.code }, {
     new: true
   });
 
@@ -51,12 +51,12 @@ router.get('/:id', validateObjectId, async (req, res) => {
 
   if (!currency) return res.status(404).send('The currency with the given ID was not found.');
 
-  const data = await fixer.latest({ base: "EUR", symbols: [currency.name] });
+  const data = await fixer.latest({ base: "EUR", symbols: [currency.code] });
 
   res.send({
       _id: currency._id,
-      name: currency.name,
-      rate: data.rates[currency.name]
+      code: currency.code,
+      rate: data.rates[currency.code]
   });
 });
 

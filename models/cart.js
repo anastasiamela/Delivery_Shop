@@ -78,7 +78,7 @@ class Cart {
 function validateCart(cart) {
     const schema = Joi.object({
       productId: Joi.objectId().required(),
-      quantity: Joi.number().min(0).required()
+      quantity: Joi.number().min(0).max(50).required()
     });
   
     return schema.validate(cart);

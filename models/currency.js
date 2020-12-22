@@ -2,7 +2,7 @@ const Joi = require('joi');
 const mongoose = require('mongoose');
 
 const currencySchema = new mongoose.Schema({
-  name: {
+  code: {
     type: String,
     required: true,
     length: 3
@@ -13,7 +13,7 @@ const Currency = mongoose.model('Currency', currencySchema);
 
 function validateCurrency(currency) {
   const schema = Joi.object({
-    name: Joi.string().length(3).required()
+    code: Joi.string().length(3).required()
   });
 
   return schema.validate(currency);

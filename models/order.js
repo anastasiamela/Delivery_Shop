@@ -71,13 +71,12 @@ const Order = mongoose.model('Order', new mongoose.Schema({
         type: Number,
         required: true,
         min: 0,
-        max: 255
       },
       quantity: {
         type: Number,
         required: true,
         min: 0,
-        max: 255
+        max: 50
       }
     }),
     required: true
@@ -94,6 +93,23 @@ const Order = mongoose.model('Order', new mongoose.Schema({
     required: true,
     default: Date.now
   },
+  currencyInfo: {
+    type: new mongoose.Schema({
+      code: {
+        type: String,
+        required: true,
+        trim: true,
+        minlength: 5,
+        maxlength: 255
+      },
+      rate: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
+    }),
+    required: true
+  }
 }));
 
 function validateOrder(order) {
@@ -107,11 +123,8 @@ function validateOrder(order) {
     zipcode: Joi.string().min(5).max(5).required(),
     floorNumber: Joi.number().min(0).required(),
     doorbellName: Joi.string().min(5).max(50).required(),
-    comments: Joi.string().max(500).optional()
-    // products: Joi.array().items(Joi.object({
-    //   productId: Joi.objectId().required(),
-    //   quantity: Joi.number().min(0).required(),
-    // }))
+    comments: Joi.string().max(500).optional(),
+    currencyId: Joi.objectId().required(),
   });
 
   return schema.validate(order);

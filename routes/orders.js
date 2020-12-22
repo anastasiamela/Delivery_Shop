@@ -2,8 +2,10 @@ const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const { Order, validate } = require('../models/order');
 const { Product } = require('../models/product');
+const { Currency } = require('../models/currency');
 const { Cart } = require('../models/cart');
 const mongoose = require('mongoose');
+const fixer = require("fixer-api");
 const Fawn = require('fawn');
 const express = require('express');
 const router = express.Router();
@@ -23,6 +25,11 @@ router.post('/', async (req, res) => {
         return res.status(400).send('The cart is empty.');
     }
     const cart = new Cart(req.session.cart);
+
+    const currency = await Currency.findById(req.body.currencyId);
+    if (!currency) return res.status(400).send('Invalid currency.');
+
+    const data = await fixer.latest({ base: "EUR", symbols: [currency.code] });
 
     for (let i = 0; i < cart.items.length; i++) {
         let item = cart.items[i];
@@ -44,7 +51,12 @@ router.post('/', async (req, res) => {
             doorbellName: req.body.doorbellName,
         },
         products: cart.items,
-        comments: req.body.comments
+        comments: req.body.comments,
+        currencyInfo: {
+            _id: currency._id,
+            code: currency.code,
+            rate: data.rates[currency.code]
+        }
     });
 
     try {
