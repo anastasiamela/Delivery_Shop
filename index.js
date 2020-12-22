@@ -22,7 +22,7 @@ if (!config.get('jwtPrivateKey')) {
   process.exit(1);
 }
 
-mongoose.connect('mongodb://localhost/delivery', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost/delivery_shop', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB...'))
   .catch(err => console.error('Could not connect to MongoDB...'));
 
@@ -41,8 +41,8 @@ app.use('/delivery/api/currencies', currencies);
 app.use('/delivery/api/products', products);
 app.use('/delivery/api/cart', carts)
 app.use('/delivery/api/orders', orders);
-app.use('/api/users', users);
-app.use('/api/auth', auth);
+app.use('/delivery/api/users', users);
+app.use('/delivery/api/auth', auth);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
