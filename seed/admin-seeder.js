@@ -10,7 +10,8 @@ mongoose.connect('mongodb://localhost/delivery_shop', { useNewUrlParser: true, u
 let user = new User({
     name: "Shop Admin Anastasia",
     email: "shop@gmail.com",
-    password: "12345"
+    password: "12345",
+    isAdmin: true
 });
 
 saveUser(user);
