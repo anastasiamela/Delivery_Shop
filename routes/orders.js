@@ -1,5 +1,6 @@
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
+const validateObjectId = require('../middleware/validateObjectId')
 const { Order, validate } = require('../models/order');
 const { Product } = require('../models/product');
 const { Currency } = require('../models/currency');
@@ -31,11 +32,14 @@ router.post('/', async (req, res) => {
 
     const data = await fixer.latest({ base: "EUR", symbols: [currency.code] });
 
+    //let totalPriceInEuro = 0;
+
     for (let i = 0; i < cart.items.length; i++) {
         let item = cart.items[i];
         const product = await Product.findById(item._id);
         if (!product) return res.status(400).send('Invalid product.');
         if (product.numberInStock - item.quantity < 0) return res.status(400).send('Product not in stock.');
+        //totalPriceInEuro = totalPriceInEuro + item.quantity * product.price;
     }
 
     let order = new Order({
@@ -90,7 +94,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/:id', [auth, admin], async (req, res) => {
+router.get('/:id', [validateObjectId, auth, admin], async (req, res) => {
     const order = await Order.findById(req.params.id);
 
     if (!order) return res.status(404).send('The order with the given ID was not found.');

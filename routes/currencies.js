@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   res.send(currencies);
 });
 
-router.post('/', /*[auth, admin],*/ async (req, res) => {
+router.post('/', [auth, admin], async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -25,7 +25,7 @@ router.post('/', /*[auth, admin],*/ async (req, res) => {
   res.send(currency);
 });
 
-router.put('/:id', [auth, admin], async (req, res) => {
+router.put('/:id', [validateObjectId, auth, admin], async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -38,7 +38,7 @@ router.put('/:id', [auth, admin], async (req, res) => {
   res.send(currency);
 });
 
-router.delete('/:id', [auth, admin], async (req, res) => {
+router.delete('/:id', [validateObjectId, auth, admin], async (req, res) => {
   const currency = await Currency.findByIdAndRemove(req.params.id);
 
   if (!currency) return res.status(404).send('The currency with the given ID was not found.');

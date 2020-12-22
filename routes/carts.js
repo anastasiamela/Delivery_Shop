@@ -1,5 +1,6 @@
 const {Cart, validate } = require('../models/cart');
 const { Product } = require('../models/product');
+const validateObjectId = require('../middleware/validateObjectId');
 const mongoose = require('mongoose');
 const express = require('express');
 // const session = require('express-session');
@@ -40,9 +41,9 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:productId', async (req, res) => {
+router.put('/:id', validateObjectId, async (req, res) => {
   const qty = req.body.quantity;
-  const product = await Product.findById(req.params.productId);
+  const product = await Product.findById(req.params.id);
   if (!product) return res.status(400).send('Invalid product.');
 
   const cart = new Cart(req.session.cart ? req.session.cart : {});
@@ -58,8 +59,8 @@ router.put('/:productId', async (req, res) => {
   }
 });
 
-router.delete('/:productId', async (req, res) => {
-  const product = await Product.findById(req.params.productId);
+router.delete('/:id', validateObjectId, async (req, res) => {
+  const product = await Product.findById(req.params.id);
   if (!product) return res.status(400).send('Invalid product.');
 
   const cart = new Cart(req.session.cart ? req.session.cart : {});
