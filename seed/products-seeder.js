@@ -1,7 +1,7 @@
 const { Product } = require('../models/product');
 const mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/delivery', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost/delivery_test', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB...'))
     .catch(err => console.error('Could not connect to MongoDB...'));
 
@@ -124,16 +124,6 @@ new Product({
     },
     numberInStock: 25,
     price: 6.3
-}),
-new Product({
-    name: "Chilorio",
-    description: "Με λουκάνικο, αβοκάντο, κόκκινες μεξικάνικες πιπεριές & κόλιανδρο.",
-    category: {
-        _id: "5fdfbab389401c2cf40dfde8",
-        name: "Tacos"
-    },
-    numberInStock: 25,
-    price: 6
 }),
 new Product({
     name: "Chilorio",
