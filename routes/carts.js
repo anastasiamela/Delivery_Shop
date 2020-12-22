@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
   if(!req.session.cart || !req.session.cart.items.length > 0) {
-    return res.status(400).send('The cart is empty.');
+    return res.send('The cart is empty.');
   }
   let cart = new Cart(req.session.cart);
   cart.calculateTotals();

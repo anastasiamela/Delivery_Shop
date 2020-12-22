@@ -6,6 +6,7 @@ const { Product } = require('../models/product');
 const { Currency } = require('../models/currency');
 const { Cart } = require('../models/cart');
 const mongoose = require('mongoose');
+const Joi = require('joi');
 const fixer = require("fixer-api");
 const Fawn = require('fawn');
 const express = require('express');
@@ -94,6 +95,14 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.delete('/:id', [validateObjectId, auth, admin], async (req, res) => {
+    const order = await Product.findByIdAndRemove(req.params.id);
+
+    if (!order) return res.status(404).send('The order with the given ID was not found.');
+
+    res.send(order);
+});
+
 router.get('/:id', [validateObjectId, auth, admin], async (req, res) => {
     const order = await Order.findById(req.params.id);
 
@@ -101,5 +110,24 @@ router.get('/:id', [validateObjectId, auth, admin], async (req, res) => {
 
     res.send(order);
 });
+
+router.patch('/:id', auth, async (req, res) => {
+    const { error } = validatePatch(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    const order = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    if (!order) return res.status(404).send('The order with the given ID was not found.');
+
+    res.send(order);
+});
+
+function validatePatch(req) {
+    const schema = Joi.object({
+        isDelivered: Joi.boolean().required(),
+    });
+
+    return schema.validate(req);
+}
 
 module.exports = router; 

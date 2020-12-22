@@ -93,6 +93,10 @@ const Order = mongoose.model('Order', new mongoose.Schema({
     required: true,
     default: Date.now
   },
+  isDelivered: {
+    type: Boolean,
+    default: false
+  },
   currencyInfo: {
     type: new mongoose.Schema({
       code: {
