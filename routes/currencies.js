@@ -1,19 +1,30 @@
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const validateObjectId = require('../middleware/validateObjectId');
-const {Currency, validate, currencySchema} = require('../models/currency');
+const { Currency, validate, currencySchema } = require('../models/currency');
 const mongoose = require('mongoose');
 const fixer = require("fixer-api");
 const express = require('express');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const currencies = await Currency.find().sort('code');
-  res.send(currencies);
+  const view = req.query.view;
+  if (typeof view === 'undefined' || view === '') {
+    const currencies = await Currency.find().sort('code');
+    res.send(currencies);
+  }
+  else if (view === 'ALL') {
+    const data = await fixer.symbols({
+      access_key: '9edaaf9b21fb2ec431ed3d46bb786c32'
+    });
+    res.send(data.symbols);
+  }
+  else return res.status(400).send('Wrong value for the query parameter view.');
+
 });
 
 router.post('/', [auth, admin], async (req, res) => {
-  const { error } = validate(req.body); 
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   let currency = await Currency.findOne({ name: req.body.code });
@@ -21,12 +32,12 @@ router.post('/', [auth, admin], async (req, res) => {
 
   currency = new Currency({ name: req.body.code });
   currency = await currency.save();
-  
+
   res.send(currency);
 });
 
-router.put('/:id', [validateObjectId, auth, admin], async (req, res) => {
-  const { error } = validate(req.body); 
+router.patch('/:id', [validateObjectId, auth, admin], async (req, res) => {
+  const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   const currency = await Currency.findByIdAndUpdate(req.params.id, { code: req.body.code }, {
@@ -34,7 +45,7 @@ router.put('/:id', [validateObjectId, auth, admin], async (req, res) => {
   });
 
   if (!currency) return res.status(404).send('The currency with the given ID was not found.');
-  
+
   res.send(currency);
 });
 
@@ -54,9 +65,9 @@ router.get('/:id', validateObjectId, async (req, res) => {
   const data = await fixer.latest({ base: "EUR", symbols: [currency.code] });
 
   res.send({
-      _id: currency._id,
-      code: currency.code,
-      rate: data.rates[currency.code]
+    _id: currency._id,
+    code: currency.code,
+    rate: data.rates[currency.code]
   });
 });
 
