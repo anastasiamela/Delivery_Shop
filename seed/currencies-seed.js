@@ -12,7 +12,7 @@ new Currency({
     code: "USD",
 }),
 new Currency({
-    code: "GBT",
+    code: "GBP",
 })];
 
 let done = 0;

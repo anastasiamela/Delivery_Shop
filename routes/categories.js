@@ -13,11 +13,10 @@ router.get('/', async (req, res) => {
 
 router.post('/', [auth, admin], async (req, res) => {
   const { error } = validate(req.body); 
-  if (error) {console.log('1'); return res.status(400).send(error.details[0].message);}
+  if (error) return res.status(400).send(error.details[0].message);
 
   let category = await Category.findOne({ name: req.body.name });
   if (category) return res.status(400).send('Category already exists.');
-
 
   category = new Category({ name: req.body.name });
   category = await category.save();
@@ -29,7 +28,10 @@ router.patch('/:id', [validateObjectId, auth, admin], async (req, res) => {
   const { error } = validate(req.body); 
   if (error) return res.status(400).send(error.details[0].message);
 
-  const category = await Category.findByIdAndUpdate(req.params.id, { name: req.body.name }, {
+  let category = await Category.findOne({ name: req.body.name });
+  if (category) return res.status(400).send('Category already exists.');
+
+  category = await Category.findByIdAndUpdate(req.params.id, { name: req.body.name }, {
     new: true
   });
 

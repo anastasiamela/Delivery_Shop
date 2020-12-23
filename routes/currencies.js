@@ -27,10 +27,15 @@ router.post('/', [auth, admin], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  let currency = await Currency.findOne({ name: req.body.code });
+  let currency = await Currency.findOne({ code: req.body.code });
   if (currency) return res.status(400).send('Currency already exists.');
 
-  currency = new Currency({ name: req.body.code });
+  const data = await fixer.symbols({
+    access_key: '9edaaf9b21fb2ec431ed3d46bb786c32'
+  });
+  if(!data.symbols[req.body.code]) return res.status(400).send('Invalid code.');
+
+  currency = new Currency({ code: req.body.code });
   currency = await currency.save();
 
   res.send(currency);
@@ -40,7 +45,15 @@ router.patch('/:id', [validateObjectId, auth, admin], async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const currency = await Currency.findByIdAndUpdate(req.params.id, { code: req.body.code }, {
+  let currency = await Currency.findOne({ code: req.body.code });
+  if (currency) return res.status(400).send('Currency already exists.');
+
+  const data = await fixer.symbols({
+    access_key: '9edaaf9b21fb2ec431ed3d46bb786c32'
+  });
+  if(!data.symbols[req.body.code]) return res.status(400).send('Invalid code.');
+
+  currency = await Currency.findByIdAndUpdate(req.params.id, { code: req.body.code }, {
     new: true
   });
 
