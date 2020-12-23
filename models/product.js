@@ -8,7 +8,7 @@ const Product = mongoose.model('Product', new mongoose.Schema({
     required: true,
     trim: true, 
     minlength: 5,
-    maxlength: 255
+    maxlength: 50
   },
   description: {
     type: String,
@@ -24,8 +24,7 @@ const Product = mongoose.model('Product', new mongoose.Schema({
   numberInStock: { 
     type: Number, 
     required: true,
-    min: 0,
-    max: 255
+    min: 0
   },
   price: { 
     type: Number, 

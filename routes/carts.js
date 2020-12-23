@@ -3,6 +3,7 @@ const { Product } = require('../models/product');
 const validateObjectId = require('../middleware/validateObjectId');
 const mongoose = require('mongoose');
 const express = require('express');
+const Joi = require('joi');
 // const session = require('express-session');
 const router = express.Router();
 
@@ -42,8 +43,12 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', validateObjectId, async (req, res) => {
+router.patch('/:id', validateObjectId, async (req, res) => {
+  const { error } = validatePatch(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
   const qty = req.body.quantity;
+  
   const product = await Product.findById(req.params.id);
   if (!product) return res.status(400).send('Invalid product.');
   if (product.numberInStock < qty) return res.status(400).send('Product not in stock.');
@@ -85,5 +90,13 @@ router.delete('/', async (req, res) => {
   req.session.cart = cart;
   res.send('The cart is empty now.');
 });
+
+function validatePatch(req) {
+  const schema = Joi.object({
+    quantity: Joi.number().min(0).required()
+  });
+
+  return schema.validate(req);
+}
 
 module.exports = router; 
